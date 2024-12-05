@@ -1,5 +1,3 @@
-# Self Driving Car
-
 # Importing the libraries
 import numpy as np
 from random import random, randint
@@ -10,7 +8,7 @@ import time
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
-from kivy.graphics import Color, Ellipse, Line
+from kivy.graphics import Color, Ellipse, Line, Rectangle
 from kivy.config import Config
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty
 from kivy.vector import Vector
@@ -29,8 +27,8 @@ n_points = 0
 length = 0
 
 # Getting our AI, which we call "brain", and that contains our neural network that represents our Q-function
-brain = Dqn(5,3,0.9)
-action2rotation = [0,20,-20]
+brain = Dqn(5, 3, 0.9)
+action2rotation = [0, 20, -20]
 last_reward = 0
 scores = []
 
@@ -41,7 +39,7 @@ def init():
     global goal_x
     global goal_y
     global first_update
-    sand = np.zeros((longueur,largeur))
+    sand = np.zeros((longueur, largeur))
     goal_x = 20
     goal_y = largeur - 20
     first_update = False
@@ -50,9 +48,7 @@ def init():
 last_distance = 0
 
 # Creating the car class
-
 class Car(Widget):
-    
     angle = NumericProperty(0)
     rotation = NumericProperty(0)
     velocity_x = NumericProperty(0)
@@ -78,9 +74,9 @@ class Car(Widget):
         self.sensor1 = Vector(30, 0).rotate(self.angle) + self.pos
         self.sensor2 = Vector(30, 0).rotate((self.angle+30)%360) + self.pos
         self.sensor3 = Vector(30, 0).rotate((self.angle-30)%360) + self.pos
-        self.signal1 = int(np.sum(sand[int(self.sensor1_x)-10:int(self.sensor1_x)+10, int(self.sensor1_y)-10:int(self.sensor1_y)+10]))/400.
-        self.signal2 = int(np.sum(sand[int(self.sensor2_x)-10:int(self.sensor2_x)+10, int(self.sensor2_y)-10:int(self.sensor2_y)+10]))/400.
-        self.signal3 = int(np.sum(sand[int(self.sensor3_x)-10:int(self.sensor3_x)+10, int(self.sensor3_y)-10:int(self.sensor3_y)+10]))/400.
+        self.signal1 = int(np.sum(sand[int(self.sensor1_x)-10:int(self.sensor1_x)+10, int(self.sensor1_y)-10:int(self.sensor1_y)+10]))/400
+        self.signal2 = int(np.sum(sand[int(self.sensor2_x)-10:int(self.sensor2_x)+10, int(self.sensor2_y)-10:int(self.sensor2_y)+10]))/400
+        self.signal3 = int(np.sum(sand[int(self.sensor3_x)-10:int(self.sensor3_x)+10, int(self.sensor3_y)-10:int(self.sensor3_y)+10]))/400
         if self.sensor1_x>longueur-10 or self.sensor1_x<10 or self.sensor1_y>largeur-10 or self.sensor1_y<10:
             self.signal1 = 1.
         if self.sensor2_x>longueur-10 or self.sensor2_x<10 or self.sensor2_y>largeur-10 or self.sensor2_y<10:
@@ -90,15 +86,15 @@ class Car(Widget):
 
 class Ball1(Widget):
     pass
+
 class Ball2(Widget):
     pass
+
 class Ball3(Widget):
     pass
 
 # Creating the game class
-
 class Game(Widget):
-
     car = ObjectProperty(None)
     ball1 = ObjectProperty(None)
     ball2 = ObjectProperty(None)
@@ -109,7 +105,6 @@ class Game(Widget):
         self.car.velocity = Vector(6, 0)
 
     def update(self, dt):
-
         global brain
         global last_reward
         global scores
@@ -126,7 +121,7 @@ class Game(Widget):
 
         xx = goal_x - self.car.x
         yy = goal_y - self.car.y
-        orientation = Vector(*self.car.velocity).angle((xx,yy))/180.
+        orientation = Vector(*self.car.velocity).angle((xx, yy))/180.
         last_signal = [self.car.signal1, self.car.signal2, self.car.signal3, orientation, -orientation]
         action = brain.update(last_reward, last_signal)
         scores.append(brain.score())
@@ -137,10 +132,10 @@ class Game(Widget):
         self.ball2.pos = self.car.sensor2
         self.ball3.pos = self.car.sensor3
 
-        if sand[int(self.car.x),int(self.car.y)] > 0:
+        if sand[int(self.car.x), int(self.car.y)] > 0:
             self.car.velocity = Vector(1, 0).rotate(self.car.angle)
             last_reward = -1
-        else: # otherwise
+        else:  # otherwise
             self.car.velocity = Vector(6, 0).rotate(self.car.angle)
             last_reward = -0.2
             if distance < last_distance:
@@ -160,25 +155,24 @@ class Game(Widget):
             last_reward = -1
 
         if distance < 100:
-            goal_x = self.width-goal_x
-            goal_y = self.height-goal_y
+            goal_x = self.width - goal_x
+            goal_y = self.height - goal_y
         last_distance = distance
 
 # Adding the painting tools
-
 class MyPaintWidget(Widget):
 
     def on_touch_down(self, touch):
         global length, n_points, last_x, last_y
         with self.canvas:
-            Color(0.8,0.7,0)
+            Color(0.8, 0.7, 0)
             d = 10.
-            touch.ud['line'] = Line(points = (touch.x, touch.y), width = 10)
+            touch.ud['line'] = Line(points=(touch.x, touch.y), width=10)
             last_x = int(touch.x)
             last_y = int(touch.y)
             n_points = 0
             length = 0
-            sand[int(touch.x),int(touch.y)] = 1
+            sand[int(touch.x), int(touch.y)] = 1
 
     def on_touch_move(self, touch):
         global length, n_points, last_x, last_y
@@ -188,11 +182,27 @@ class MyPaintWidget(Widget):
             y = int(touch.y)
             length += np.sqrt(max((x - last_x)**2 + (y - last_y)**2, 2))
             n_points += 1.
-            density = n_points/(length)
+            density = n_points / (length)
             touch.ud['line'].width = int(20 * density + 1)
             sand[int(touch.x) - 10 : int(touch.x) + 10, int(touch.y) - 10 : int(touch.y) + 10] = 1
             last_x = x
             last_y = y
+
+# Adding the API Buttons (clear, save and load)
+class CarApp(App):
+
+    def build(self):
+        parent = Game()
+        parent.serve_car()
+        Clock.schedule_interval(parent.update, 1.0 / 60.0)
+        self.painter = MyPaintWidget()
+        clearbtn = Button(text='clear')
+        savebtn = Button(text='save')
+        loadbtn = Button(text='load')
+        savebtn.baind(on_release=parent.save_file)
+        loadbtn.bind(on_release=parent.load_file)
+        clearbtn.bind(on_release=self.painter.clear)
+        return parent
 
 # Adding the API Buttons (clear, save and load)
 

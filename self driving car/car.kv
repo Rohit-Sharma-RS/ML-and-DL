@@ -2,15 +2,31 @@
 # ref: https://kivy.org/docs/tutorials/pong.html
 
 <Car>:
-    size: 20, 10
+    size: 50, 30  # Increase size to make it more robot-like
     canvas:
         PushMatrix
         Rotate:
             angle: self.angle
             origin: self.center
+        # Robot body
         Rectangle:
             pos: self.pos
             size: self.size
+        # Robot eyes (rectangles as eyes)
+        Color:
+            rgba: 0, 0, 0, 1
+        Rectangle:
+            pos: self.pos[0] + 10, self.pos[1] + 10  # Left eye
+            size: 8, 8
+        Rectangle:
+            pos: self.pos[0] + 30, self.pos[1] + 10  # Right eye
+            size: 8, 8
+        # Robot antenna
+        Color:
+            rgba: 1, 1, 0, 1  # Yellow color for antenna
+        Line:
+            width: 2
+            points: self.center_x, self.top, self.center_x, self.top + 20  # Antenna line
         PopMatrix
 
 <Ball1>:
@@ -21,6 +37,7 @@
         Ellipse:
             pos: self.pos
             size: self.size
+
 <Ball2>:
     size: 10,10
     canvas:
