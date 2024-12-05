@@ -6,7 +6,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
-import torch.autograd as autograd
 
 # let us make the neural network
 
@@ -39,10 +38,8 @@ class ReplayMemory(object):
             del self.memory[0]
     
     def sample(self, batch_size):
-        # zip *list is interesting *((state,action,reward), (state,action,reward))
-        # output = (state,state), (action,action), (reward,reward)
         sample = zip(*random.sample(self.memory, batch_size))
-        return map(lambda x: Variable(torch.cat(x, 0)), sample)
+        return [Variable(torch.cat(x, 0)) for x in sample]
     
 # implementing deep q learning
 class Dqn():
@@ -58,14 +55,13 @@ class Dqn():
         self.last_reward = 0
     
     def select_action(self, state):
-        probs = F.softmax(self.model(Variable(state, volatile=True))*100)  # temperature=7 so more like a car
-        #if softmax ([1, 2, 3] * temperature)->[0.0, 0.02, 0.98]  so more sure
-        # volatile will help in making gradient graph easily
-        action = probs.multinomial(num_samples=1)
-        return action.data[0, 0]
+        with torch.no_grad():
+            q_values = self.model(state)
+            action = torch.argmax(q_values).item()  # Choose the action with the max Q-value
+        return action
+
     
     def learn(self, batch_state, batch_next_state, batch_reward, batch_action):
-        # Ensure batch_action is of type int64
         batch_action = batch_action.long()
 
         outputs = self.model(batch_state).gather(1, batch_action.unsqueeze(1)).squeeze(1)
@@ -75,13 +71,12 @@ class Dqn():
         self.optimizer.zero_grad()
         td_loss.backward()
         self.optimizer.step()  # Update weights of the optimizer for nn
-    # update weights of the optimizer for nn
     
     def update(self, reward, new_signal):
         new_state = torch.Tensor(new_signal).float().unsqueeze(0)
         self.memory.push((self.last_state, new_state, torch.LongTensor([int(self.last_action)]), torch.Tensor([self.last_reward])))
         action = self.select_action(new_state)
-        if len(self.memory.memory)>100:
+        if len(self.memory.memory) > 100:
             batch_state, batch_next_state, batch_reward, batch_action = self.memory.sample(100)
             self.learn(batch_state, batch_next_state, batch_reward, batch_action)
         self.last_action = action
@@ -92,11 +87,11 @@ class Dqn():
         return action
 
     def score(self):
-        return sum(self.reward_window) /(len(self.reward_window))+1
+        return sum(self.reward_window) / (len(self.reward_window) + 1)
     
     def save(self):
         torch.save({"state_dict": self.model.state_dict(),
-                    "optimizer": self.optimizer.state_dict,
+                    "optimizer": self.optimizer.state_dict(),
                     }, "last_brain.pth")
         
     def load(self):
@@ -108,7 +103,3 @@ class Dqn():
             print("Done")
         else:
             print("No checkpoints")
-    
-
-
-
