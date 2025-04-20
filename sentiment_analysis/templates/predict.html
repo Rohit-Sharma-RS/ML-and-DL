@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>Predict Sentiment</h2>
+    <div class="card">
+        <form method="post" action="/predict">
+            <div class="form-group">
+                <label for="review_text">Enter Review Text:</label>
+                <textarea name="review_text" id="review_text" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="button">Analyze Sentiment</button>
+        </form>
+        
+        {% if result %}
+        <div class="chart-container">
+            <h3>Sentiment Analysis Result</h3>
+            <div class="review-item {% if result.prediction == 'Positive' %}review-positive{% else %}review-negative{% endif %}">
+                <p><strong>Original Text:</strong> {{ result.raw_text }}</p>
+                <p><strong>Preprocessed Text:</strong> {{ result.preprocessed_text }}</p>
+                <p><strong>Predicted Sentiment:</strong> {{ result.prediction }}</p>
+                <p><strong>Confidence:</strong> {{ "%.2f"|format(result.probability * 100) }}%</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>Explore Reviews</h2>
+    <div class="card">
+        <form method="get" action="/explore">
+            <div class="form-group">
+                <label for="filter">Filter by Sentiment:</label>
+                <select name="filter" id="filter" onchange="this.form.submit()">
+                    <option value="all" {% if current_filter == 'all' %}selected{% endif %}>All Reviews</option>
+                    <option value="positive" {% if current_filter == 'positive' %}selected{% endif %}>Positive Reviews</option>
+                    <option value="negative" {% if current_filter == 'negative' %}selected{% endif %}>Negative Reviews</option>
+                </select>
+            </div>
+        </form>
+        
+        <div class="chart-container">
+            <h3>Common Words in Selected Reviews</h3>
+            <img src="data:image/png;base64,{{ word_freq_chart }}" alt="Word Frequencies">
+        </div>
+        
+        <h3>Reviews</h3>
+        {% for review in reviews %}
+        <div class="review-item {% if review.sentiment == 1 %}review-positive{% else %}review-negative{% endif %}">
+            <p><strong>Review:</strong> {{ review.review_text }}</p>
+            <p><strong>Cleaned Text:</strong> {{ review.cleaned_text }}</p>
+            <p><strong>Sentiment:</strong> {% if review.sentiment == 1 %}Positive{% else %}Negative{% endif %}</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

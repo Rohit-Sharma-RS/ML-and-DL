@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>Dataset Overview</h2>
+    <div class="card">
+        <div class="chart-container">
+            <h3>Sentiment Distribution</h3>
+            <img src="data:image/png;base64,{{ sentiment_pie_chart }}" alt="Sentiment Distribution">
+        </div>
+        <div class="chart-container">
+            <h3>Review Length Distribution</h3>
+            <img src="data:image/png;base64,{{ review_length_hist }}" alt="Review Length Histogram">
+        </div>
+    </div>
+    
+    <h2>Model Performance ({{ best_model_name }})</h2>
+    <div class="card">
+        <div class="chart-container">
+            <h3>Confusion Matrix</h3>
+            <img src="data:image/png;base64,{{ confusion_matrix_chart }}" alt="Confusion Matrix">
+        </div>
+        <div class="metrics">
+            <div class="metric-item">
+                <h3>Model Metrics</h3>
+                <p><strong>Accuracy:</strong> {{ "%.4f"|format(accuracy) }}</p>
+                <p><strong>Positive Class - Precision:</strong> {{ "%.4f"|format(pos_precision) }}</p>
+                <p><strong>Positive Class - Recall:</strong> {{ "%.4f"|format(pos_recall) }}</p>
+                <p><strong>Positive Class - F1-Score:</strong> {{ "%.4f"|format(pos_f1) }}</p>
+            </div>
+            <div class="metric-item">
+                <h3>Additional Metrics</h3>
+                <p><strong>Negative Class - Precision:</strong> {{ "%.4f"|format(neg_precision) }}</p>
+                <p><strong>Negative Class - Recall:</strong> {{ "%.4f"|format(neg_recall) }}</p>
+                <p><strong>Negative Class - F1-Score:</strong> {{ "%.4f"|format(neg_f1) }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Important Words for Sentiment Classification</h2>
+    <div class="card">
+        <div class="chart-container">
+            <h3>Top Positive Sentiment Words</h3>
+            <img src="data:image/png;base64,{{ pos_features_chart }}" alt="Positive Features">
+        </div>
+        <div class="chart-container">
+            <h3>Top Negative Sentiment Words</h3>
+            <img src="data:image/png;base64,{{ neg_features_chart }}" alt="Negative Features">
+        </div>
+    </div>
+    
+    <h2>Sample Reviews</h2>
+    <div class="card">
+        <h3>Positive Reviews</h3>
+        {% for review in positive_reviews %}
+        <div class="review-item review-positive">
+            <p><strong>Review:</strong> {{ review.review_text }}</p>
+            <p><strong>Cleaned Text:</strong> {{ review.cleaned_text }}</p>
+        </div>
+        {% endfor %}
+        
+        <h3>Negative Reviews</h3>
+        {% for review in negative_reviews %}
+        <div class="review-item review-negative">
+            <p><strong>Review:</strong> {{ review.review_text }}</p>
+            <p><strong>Cleaned Text:</strong> {{ review.cleaned_text }}</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

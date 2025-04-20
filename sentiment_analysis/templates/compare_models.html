@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>Model Comparison</h2>
+    <div class="card">
+        <div class="chart-container">
+            <h3>Model Accuracy Comparison</h3>
+            <img src="data:image/png;base64,{{ model_comparison_chart }}" alt="Model Comparison Chart">
+        </div>
+        
+        <h3>Detailed Model Metrics</h3>
+        <table border="1" style="width:100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th style="padding: 8px;">Model</th>
+                    <th style="padding: 8px;">Accuracy</th>
+                    <th style="padding: 8px;">Positive Precision</th>
+                    <th style="padding: 8px;">Positive Recall</th>
+                    <th style="padding: 8px;">Positive F1</th>
+                    <th style="padding: 8px;">Negative Precision</th>
+                    <th style="padding: 8px;">Negative Recall</th>
+                    <th style="padding: 8px;">Negative F1</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for model in models_data %}
+                <tr>
+                    <td style="padding: 8px;">{{ model.name }}</td>
+                    <td style="padding: 8px;">{{ "%.4f"|format(model.accuracy) }}</td>
+                    <td style="padding: 8px;">{{ "%.4f"|format(model.pos_precision) }}</td>
+                    <td style="padding: 8px;">{{ "%.4f"|format(model.pos_recall) }}</td>
+                    <td style="padding: 8px;">{{ "%.4f"|format(model.pos_f1) }}</td>
+                    <td style="padding: 8px;">{{ "%.4f"|format(model.neg_precision) }}</td>
+                    <td style="padding: 8px;">{{ "%.4f"|format(model.neg_recall) }}</td>
+                    <td style="padding: 8px;">{{ "%.4f"|format(model.neg_f1) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
