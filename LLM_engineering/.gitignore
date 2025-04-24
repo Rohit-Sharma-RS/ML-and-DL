@@ -1,1 +1,6 @@
 .env
+*.java
+*.cpp
+*.exe
+*.class
+*.txt
