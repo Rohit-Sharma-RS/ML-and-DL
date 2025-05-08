@@ -1,7 +1,6 @@
 *.env
 .env
 *.pkl
-.env
 *.java
 *.cpp
 *.exe
