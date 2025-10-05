@@ -11,4 +11,3 @@ This project fine-tunes a LLaMA-3B model to accurately predict product prices so
 🧪 Frontier Testing: Tested for out-of-distribution generalization on unseen product types.
 
 🧠 Context Engineering: Tuned input formatting, added price cues, controlled hallucination.
-
